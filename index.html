@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VibeLoop — Social, Videos & Community</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--brand:#2563eb;--brand2:#8b5cf6}
+body.dark{--bg:#0b1020;--card:#131a2b;--text:#f9fafb;--muted:#9ca3af;--line:#263047}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{height:62px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:10}
+.logo{font-size:23px;font-weight:800}.logo b{color:var(--brand)}button{border:0;cursor:pointer}.icon{background:transparent;color:var(--text);font-size:21px}
+.app{max-width:650px;margin:auto;padding:14px 14px 90px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:14px;padding:14px}
+.create{display:flex;gap:10px;align-items:center}.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:white;font-weight:bold}
+.create input{flex:1;border:1px solid var(--line);border-radius:24px;padding:12px;background:var(--bg);color:var(--text)}
+.tabs{display:flex;gap:8px;margin:0 0 14px}.tab{padding:9px 15px;border-radius:20px;background:var(--card);color:var(--text);border:1px solid var(--line)}.tab.active{background:var(--brand);color:#fff}
+.posthead{display:flex;gap:10px}.name{font-weight:bold}.muted{color:var(--muted);font-size:13px}.posttext{line-height:1.5}.media{height:260px;border-radius:13px;margin:12px 0;background:linear-gradient(135deg,#2563eb,#8b5cf6,#ec4899);display:grid;place-items:center;color:#fff;font-size:48px}
+.actions{display:flex;justify-content:space-around;border-top:1px solid var(--line);padding-top:10px}.actions button{background:transparent;color:var(--text);font-size:15px}
+.page{display:none}.page.active{display:block}.video{height:calc(100vh - 150px);min-height:500px;background:#111;border-radius:18px;overflow:hidden;position:relative;color:white;display:grid;place-items:center}.video video{width:100%;height:100%;object-fit:cover}.videoInfo{position:absolute;bottom:18px;left:16px;right:70px}.side{position:absolute;right:14px;bottom:20px;display:grid;gap:18px;text-align:center}.side button{background:#ffffff22;color:white;border-radius:50%;width:48px;height:48px;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.tile{height:150px;border-radius:14px;background:linear-gradient(135deg,#f97316,#ec4899);padding:12px;color:#fff;font-weight:bold}
+.profile{text-align:center}.bigavatar{width:88px;height:88px;margin:10px auto;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:#fff;font-size:32px}
+.nav{position:fixed;bottom:0;left:0;right:0;height:70px;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:20}.navin{width:min(650px,100%);display:flex;justify-content:space-around}.nav button{background:transparent;color:var(--muted);font-size:11px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:3px}.nav button.active{color:var(--brand)}.nav span{font-size:22px}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:30;align-items:end;justify-content:center}.modal.show{display:flex}.sheet{width:min(650px,100%);background:var(--card);padding:20px;border-radius:24px 24px 0 0}.sheet textarea{width:100%;height:120px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text)}.primary{background:var(--brand);color:white;padding:12px 18px;border-radius:10px;margin-top:10px;width:100%}
+.search{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);margin-bottom:12px}
+</style></head>
+<body>
+<header><div class="logo">Vibe<b>Loop</b></div><button class="icon" onclick="toggleTheme()">☾</button></header>
+<main class="app">
+<section id="home" class="page active">
+<div class="tabs"><button class="tab active">For You</button><button class="tab">Following</button><button class="tab">Friends</button></div>
+<div class="card create"><div class="avatar">V</div><input placeholder="What's happening?" onclick="openCreate()" readonly></div>
+<div id="posts"></div>
+</section>
+<section id="videos" class="page"><div class="video"><div style="font-size:70px">▶</div><div class="videoInfo"><b>@VibeLoopCreator</b><p>Welcome to the future of social media. Create. Share. Connect. ✨</p></div><div class="side"><button onclick="alert('Liked! ❤️')">♥</button><button onclick="alert('Comments coming soon')">💬</button><button onclick="share()">↗</button></div></div></section>
+<section id="discover" class="page"><input class="search" placeholder="Search VibeLoop..." oninput="filterTiles(this.value)"><h2>Discover</h2><div class="grid" id="tiles"><div class="tile">🔥 Trending Now</div><div class="tile">🎮 Gaming</div><div class="tile">⚽ Sports</div><div class="tile">🎵 Music</div><div class="tile">😂 Comedy</div><div class="tile">📚 Education</div></div></section>
+<section id="profile" class="page"><div class="card profile"><div class="bigavatar">V</div><h2>VibeLoop User</h2><p class="muted">@yourprofile</p><div style="display:flex;justify-content:space-around"><div><b>0</b><br><span class="muted">Posts</span></div><div><b>0</b><br><span class="muted">Followers</span></div><div><b>0</b><br><span class="muted">Following</span></div></div><button class="primary" onclick="alert('Profile editing will connect to the backend in Phase 2.')">Edit Profile</button></div></section>
+</main>
+<nav class="nav"><div class="navin"><button class="active" onclick="go('home',this)"><span>⌂</span>Home</button><button onclick="go('videos',this)"><span>▶</span>Videos</button><button onclick="openCreate()"><span>＋</span>Create</button><button onclick="go('discover',this)"><span>⌕</span>Discover</button><button onclick="go('profile',this)"><span>☺</span>Profile</button></div></nav>
+<div class="modal" id="modal"><div class="sheet"><h2>Create a post</h2><textarea id="postInput" placeholder="Share something with VibeLoop..."></textarea><button class="primary" onclick="publish()">Publish Post</button><button class="primary" style="background:#6b7280" onclick="closeCreate()">Cancel</button></div></div>
+<script>
+let posts=JSON.parse(localStorage.getItem('vibeloop_posts')||'[]');
+if(!posts.length) posts=[{name:'VibeLoop',text:'Welcome to VibeLoop! 🎉 This is your new place to watch videos, share posts, and connect with people.'}];
+function render(){document.getElementById('posts').innerHTML=posts.map((p,i)=>`<article class="card"><div class="posthead"><div class="avatar">${p.name[0]}</div><div><div class="name">${p.name}</div><div class="muted">Just now · 🌐</div></div></div><p class="posttext">${escapeHtml(p.text)}</p><div class="actions"><button onclick="like(this)">♡ Like</button><button onclick="alert('Comments will be added with the backend.')">💬 Comment</button><button onclick="share()">↗ Share</button></div></article>`).join('')}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function publish(){let v=document.getElementById('postInput').value.trim();if(!v)return;posts.unshift({name:'You',text:v});localStorage.setItem('vibeloop_posts',JSON.stringify(posts));document.getElementById('postInput').value='';closeCreate();render()}
+function go(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active')}
+function openCreate(){document.getElementById('modal').classList.add('show')}function closeCreate(){document.getElementById('modal').classList.remove('show')}
+function toggleTheme(){document.body.classList.toggle('dark');localStorage.setItem('vibeloop_theme',document.body.classList.contains('dark')?'dark':'light')}
+if(localStorage.getItem('vibeloop_theme')==='dark')document.body.classList.add('dark');
+function like(b){b.textContent=b.textContent.includes('♡')?'♥ Liked':'♡ Like'}function share(){navigator.share?navigator.share({title:'VibeLoop'}):alert('Sharing feature ready to connect.')}
+function filterTiles(q){document.querySelectorAll('.tile').forEach(x=>x.style.display=x.textContent.toLowerCase().includes(q.toLowerCase())?'block':'none')}
+render();
+</script></body></html>
