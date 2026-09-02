@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VibeLoop — Social, Videos & Community</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--brand:#2563eb;--brand2:#8b5cf6}
+body.dark{--bg:#0b1020;--card:#131a2b;--text:#f9fafb;--muted:#9ca3af;--line:#263047}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{height:62px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:10}
+.logo{font-size:23px;font-weight:800}.logo b{color:var(--brand)}button{border:0;cursor:pointer}.icon{background:transparent;color:var(--text);font-size:21px}
+.app{max-width:650px;margin:auto;padding:14px 14px 90px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:14px;padding:14px}
+.create{display:flex;gap:10px;align-items:center}.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:white;font-weight:bold}
+.create input{flex:1;border:1px solid var(--line);border-radius:24px;padding:12px;background:var(--bg);color:var(--text)}
+.tabs{display:flex;gap:8px;margin:0 0 14px}.tab{padding:9px 15px;border-radius:20px;background:var(--card);color:var(--text);border:1px solid var(--line)}.tab.active{background:var(--brand);color:#fff}
+.posthead{display:flex;gap:10px}.name{font-weight:bold}.muted{color:var(--muted);font-size:13px}.posttext{line-height:1.5}.media{height:260px;border-radius:13px;margin:12px 0;background:linear-gradient(135deg,#2563eb,#8b5cf6,#ec4899);display:grid;place-items:center;color:#fff;font-size:48px}
+.actions{display:flex;justify-content:space-around;border-top:1px solid var(--line);padding-top:10px}.actions button{background:transparent;color:var(--text);font-size:15px}
+.page{display:none}.page.active{display:block}.video{height:calc(100vh - 150px);min-height:500px;background:#111;border-radius:18px;overflow:hidden;position:relative;color:white;display:grid;place-items:center}.video video{width:100%;height:100%;object-fit:cover}.videoInfo{position:absolute;bottom:18px;left:16px;right:70px}.side{position:absolute;right:14px;bottom:20px;display:grid;gap:18px;text-align:center}.side button{background:#ffffff22;color:white;border-radius:50%;width:48px;height:48px;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.tile{height:150px;border-radius:14px;background:linear-gradient(135deg,#f97316,#ec4899);padding:12px;color:#fff;font-weight:bold}
+.profile{text-align:center}.bigavatar{width:88px;height:88px;margin:10px auto;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:#fff;font-size:32px}
+.nav{position:fixed;bottom:0;left:0;right:0;height:70px;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:20}.navin{width:min(650px,100%);display:flex;justify-content:space-around}.nav button{background:transparent;color:var(--muted);font-size:11px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:3px}.nav button.active{color:var(--brand)}.nav span{font-size:22px}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:30;align-items:end;justify-content:center}.modal.show{display:flex}.sheet{width:min(650px,100%);background:var(--card);padding:20px;border-radius:24px 24px 0 0}.sheet input.search{margin:7px 0;width:100%}.sheet textarea{width:100%;height:120px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text)}.primary{background:var(--brand);color:white;padding:12px 18px;border-radius:10px;margin-top:10px;width:100%}
+.search{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);margin-bottom:12px}
+
+/* VibeLoop media, calls and chat */
+.featureGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.featureBtn{padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--text);font-weight:700;text-align:left}
+.featureBtn small{display:block;color:var(--muted);font-weight:400;margin-top:4px}
+.mediaCard video{width:100%;max-height:420px;border-radius:14px;background:#000;display:block}
+.mediaMeta{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:9px}
+.mediaBtns{display:flex;gap:8px;flex-wrap:wrap}
+.mediaBtns button{padding:9px 12px;border-radius:10px;background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.callStage{background:#050505;border-radius:18px;min-height:430px;position:relative;overflow:hidden}
+#remoteVideo{width:100%;height:430px;object-fit:cover;background:#111}
+#localVideo{position:absolute;right:12px;top:12px;width:145px;height:105px;object-fit:cover;border-radius:12px;background:#222;border:2px solid #fff}
+.callControls{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;padding:12px}
+.callControls button{border-radius:999px;padding:11px 15px;background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.callControls .danger{background:#dc2626;color:#fff;border-color:#dc2626}
+.chatBox{height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--bg)}
+.msg{margin:7px 0;padding:8px 10px;border-radius:12px;background:var(--card);border:1px solid var(--line)}
+.msg b{font-size:13px}.msg span{display:block;font-size:12px;color:var(--muted)}
+.chatRow{display:flex;gap:8px;margin-top:8px}.chatRow input{flex:1;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text)}
+@media(max-width:520px){.featureGrid{grid-template-columns:1fr}.callStage,#remoteVideo{min-height:340px;height:340px}#localVideo{width:110px;height:82px}}
+</style></head>
+<body>
+<header><div class="logo">Vibe<b>Loop</b></div><div style="display:flex;gap:10px;align-items:center"><button id="authAction" class="tab" onclick="authAction()">Sign in</button><button id="themeBtn" class="icon" onclick="toggleTheme()">☾</button></div></header>
+<main class="app">
+<section id="home" class="page active">
+<div class="tabs"><button class="tab active" onclick="setFeed('for-you',this)">For You</button><button class="tab" onclick="setFeed('following',this)">Following</button><button class="tab" onclick="setFeed('friends',this)">Friends</button></div>
+<div class="card create"><div class="avatar">V</div><input placeholder="What's happening?" onclick="openCreate()" readonly></div>
+<div id="posts"></div>
+</section>
+<section id="videos" class="page">
+  <div class="featureGrid">
+    <button class="featureBtn" onclick="openMediaPicker('video')">🎬 Upload video<small>Add a movie/video from your device</small></button>
+    <button class="featureBtn" onclick="openMediaPicker('movie')">🍿 Add movie<small>Choose a video file to watch</small></button>
+    <button class="featureBtn" onclick="startCall('video')">📹 Video call<small>Start a camera call</small></button>
+    <button class="featureBtn" onclick="startCall('voice')">🎙️ Voice chat<small>Start a microphone call</small></button>
+  </div>
+  <div class="card mediaCard">
+    <h3>Watch & download</h3>
+    <p class="muted">Local videos can be watched immediately. Uploaded media can be shared through a public URL when storage is configured.</p>
+    <div id="mediaList"></div>
+  </div>
+</section>
+
+<section id="calls" class="page">
+  <div class="card">
+    <h2>Calls & Voice Chat</h2>
+    <p id="callStatus" class="muted">Ready to start a call.</p>
+    <div class="callStage">
+      <video id="remoteVideo" autoplay playsinline></video>
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+    <div class="callControls">
+      <button onclick="toggleMute()">🎙 Mute</button>
+      <button onclick="toggleCamera()">📷 Camera</button>
+      <button onclick="shareCallLink()">🔗 Share call</button>
+      <button class="danger" onclick="endCall()">☎ End</button>
+    </div>
+    <div class="chatBox" id="chatMessages"></div>
+    <div class="chatRow">
+      <input id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+      <button class="primary" style="width:auto;margin:0" onclick="sendChatMessage()">Send</button>
+    </div>
+  </div>
+</section>
+<section id="discover" class="page"><input class="search" placeholder="Search VibeLoop..." oninput="filterTiles(this.value)"><h2>Discover</h2><div class="grid" id="tiles"><div class="tile" data-key="trending now">🔥 Trending Now</div><div class="tile" data-key="gaming">🎮 Gaming</div><div class="tile" data-key="sports">⚽ Sports</div><div class="tile" data-key="music">🎵 Music</div><div class="tile" data-key="comedy">😂 Comedy</div><div class="tile" data-key="education">📚 Education</div><div id="discoverEmpty" class="muted" style="display:none;padding:16px">No matching topics.</div></div></section>
+<section id="profile" class="page"><div class="card profile"><div id="profileAvatar" class="bigavatar">V</div><h2 id="profileName">VibeLoop User</h2><p id="profileHandle" class="muted">@yourprofile</p><div style="display:flex;justify-content:space-around"><div><b>0</b><br><span class="muted">Posts</span></div><div><b>0</b><br><span class="muted">Followers</span></div><div><b>0</b><br><span class="muted">Following</span></div></div><button class="primary" onclick="alert('Profile editing will connect to the backend in Phase 2.')">Edit Profile</button></div></section>
+</main>
+<nav class="nav"><div class="navin"><button class="active" onclick="go('home',this)"><span>⌂</span>Home</button><button onclick="go('videos',this)"><span>▶</span>Videos</button><button onclick="openCreate()"><span>＋</span>Create</button><button onclick="go('calls',this)"><span>☎</span>Calls</button><button onclick="go('discover',this)"><span>⌕</span>Discover</button><button onclick="go('profile',this)"><span>☺</span>Profile</button></div></nav>
+
+<input id="mediaPicker" type="file" accept="video/*" style="display:none" onchange="handleMediaFile(this)">
+<div class="modal" id="modal"><div class="sheet"><h2>Create a post</h2><textarea id="postInput" maxlength="1000" placeholder="Share something with VibeLoop..."></textarea><div id="charCount" class="muted" style="text-align:right">0</div><button class="primary" onclick="publish()">Publish Post</button><button class="primary" style="background:#6b7280" onclick="closeCreate()">Cancel</button></div></div><div class="modal" id="authModal"><div class="sheet"><h2 id="authTitle">Sign in to VibeLoop</h2><input id="authName" class="search" placeholder="Display name" style="display:none"><input id="authEmail" class="search" type="email" placeholder="Email"><input id="authPassword" class="search" type="password" placeholder="Password"><button class="primary" onclick="submitAuth()">Continue</button><button id="authSwitch" class="primary" style="background:#6b7280" onclick="toggleAuthMode()">Create an account</button><button class="primary" style="background:#9ca3af" onclick="closeAuth()">Cancel</button></div></div><div id="toast" style="display:none;position:fixed;left:50%;bottom:85px;transform:translateX(-50%);background:#111827;color:white;padding:11px 16px;border-radius:12px;z-index:50;max-width:90%;text-align:center"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://mhbygjtmesipdvuifsul.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_0m2ndrG_UhpNogZYyDkZAw_-yXSGOfF";
+const supabaseClient=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+
+let posts=JSON.parse(localStorage.getItem('vibeloop_posts')||'[]');
+let currentUser=null, authSignup=false;
+
+if(!posts.length) posts=[{name:'VibeLoop',text:'Welcome to VibeLoop! 🎉 Sign in to create posts, like posts and join the community.',id:'welcome',created:'Just now'}];
+
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function persist(){localStorage.setItem('vibeloop_posts',JSON.stringify(posts))}
+function render(){
+  const el=document.getElementById('posts');
+  const postCount=document.getElementById('postCount'); if(postCount) postCount.textContent=posts.filter(p=>currentUser&&p.user_id===currentUser.id).length;
+  if(!posts.length){el.innerHTML='<div class="empty">No posts yet. Be the first to share something!</div>';return}
+  el.innerHTML=posts.map(p=>`<article class="card">
+    <div class="posthead"><div class="avatar">${escapeHtml((p.name||'V')[0].toUpperCase())}</div>
+    <div><div class="name">${escapeHtml(p.name||'VibeLoop')}</div><div class="muted">${escapeHtml(p.created||'Just now')} · 🌐</div></div></div>
+    <p class="posttext">${escapeHtml(p.text||'')}</p>
+    <div class="actions">
+      <button onclick="likePost('${escapeHtml(p.id)}')">♡ Like</button>
+      <button onclick="comment('${escapeHtml(p.id)}')">💬 Comment</button>
+      <button onclick="share()">↗ Share</button>
+    </div>
+  </article>`).join('');
+}
+function requireAuth(){if(!currentUser){openAuth(false);showToast('Please sign in first');return false}return true}
+async function publish(){
+  if(!requireAuth())return;
+  const input=document.getElementById('postInput'),v=input.value.trim();
+  if(!v){showToast('Write something first');input.focus();return}
+  const item={name:currentUser.user_metadata?.display_name||currentUser.email?.split('@')[0]||'You',text:v,created:'Just now',id:crypto.randomUUID?.()||Date.now().toString(),user_id:currentUser.id};
+  posts.unshift(item);persist();render();input.value='';updateCount();closeCreate();go('home',document.querySelector('.nav button'));showToast('Post published!');
+  const {error}=await supabaseClient.from('posts').insert({user_id:currentUser.id,name:item.name,text:v});
+  if(error)showToast('Saved locally; database insert was blocked by RLS');
+  else await loadSupabasePosts();
+}
+function go(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function openCreate(){if(!requireAuth())return;document.getElementById('modal').classList.add('show');setTimeout(()=>document.getElementById('postInput').focus(),50)}
+function closeCreate(){document.getElementById('modal').classList.remove('show')}
+function toggleTheme(){document.body.classList.toggle('dark');const dark=document.body.classList.contains('dark');localStorage.setItem('vibeloop_theme',dark?'dark':'light');const themeBtn=document.getElementById('themeBtn'); if(themeBtn) themeBtn.textContent=dark?'☀':'☾'}
+function like(b){const liked=b.classList.toggle('liked');b.textContent=liked?'♥ Liked':'♡ Like'}
+function toggleVideoLike(b){b.classList.toggle('liked')}
+async function likePost(id){if(!requireAuth())return;const {error}=await supabaseClient.from('likes').upsert({post_id:id,user_id:currentUser.id},{onConflict:'post_id,user_id'});if(error)showToast('Like needs the database setup below');else showToast('Liked! ❤️')}
+async function comment(id){if(!requireAuth())return;const text=prompt('Write a comment');if(!text?.trim())return;const {error}=await supabaseClient.from('comments').insert({post_id:id,user_id:currentUser.id,content:text.trim()});showToast(error?'Comment needs the database setup':'Comment added!')}
+async function share(){try{if(navigator.share)await navigator.share({title:'VibeLoop',text:'Check out VibeLoop!',url:location.href});else{await navigator.clipboard?.writeText(location.href);showToast('Link copied')}}catch(e){}}
+function filterTiles(q){let found=0;document.querySelectorAll('.tile').forEach(x=>{const show=x.dataset.key.includes(q.trim().toLowerCase());x.style.display=show?'flex':'none';if(show)found++});const empty=document.getElementById('discoverEmpty'); if(empty) empty.style.display=found?'none':'block'}
+function setFeed(type,btn){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(type!=='for-you')showToast(type==='following'?'Following feed is ready for follows':'Friends feed is ready for connections')}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',2200)}
+function updateCount(){document.getElementById('charCount').textContent=document.getElementById('postInput').value.length}
+document.getElementById('postInput').addEventListener('input',updateCount);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCreate();closeAuth()}});
+
+function openAuth(edit){document.getElementById('authModal').classList.add('show');authSignup=!!edit&&false;updateAuthUI();if(edit&&currentUser){document.getElementById('authName').value=currentUser.user_metadata?.display_name||''}}
+function closeAuth(){document.getElementById('authModal').classList.remove('show')}
+function toggleAuthMode(){authSignup=!authSignup;updateAuthUI()}
+function updateAuthUI(){document.getElementById('authTitle').textContent=authSignup?'Create your VibeLoop account':'Sign in to VibeLoop';document.getElementById('authName').style.display=authSignup?'block':'none';document.getElementById('authSwitch').textContent=authSignup?'I already have an account':'Create an account'}
+async function submitAuth(){
+  const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value,name=document.getElementById('authName').value.trim();
+  if(!email||!password){showToast('Enter email and password');return}
+  let result;
+  if(authSignup) result=await supabaseClient.auth.signUp({email,password,options:{data:{display_name:name||email.split('@')[0]}}});
+  else result=await supabaseClient.auth.signInWithPassword({email,password});
+  if(result.error){showToast(result.error.message);return}
+  if(authSignup&&!result.data.session){showToast('Check your email to confirm your account');closeAuth();return}
+  currentUser=result.data.user;closeAuth();updateAuthUIFromUser();await loadSupabasePosts();showToast('Welcome to VibeLoop!')}
+async function authAction(){if(currentUser){await supabaseClient.auth.signOut();currentUser=null;updateAuthUIFromUser();showToast('Signed out')}else openAuth(false)}
+function updateAuthUIFromUser(){
+  const label=document.getElementById('authLabel'),action=document.getElementById('authAction');
+  label.textContent=currentUser?(currentUser.user_metadata?.display_name||currentUser.email?.split('@')[0]||'Signed in'):'';
+  action.textContent=currentUser?'Sign out':'Sign in';
+  document.getElementById('profileName').textContent=currentUser?(currentUser.user_metadata?.display_name||currentUser.email?.split('@')[0]||'VibeLoop User'):'VibeLoop User';
+  document.getElementById('profileHandle').textContent=currentUser?'@'+(currentUser.email?.split('@')[0]||'user'):'@yourprofile';
+  document.getElementById('profileAvatar').textContent=(currentUser?.user_metadata?.display_name||currentUser?.email||'V')[0].toUpperCase();
+  render();
+}
+async function loadSupabasePosts(){
+  if(!supabaseClient)return;
+  const {data,error}=await supabaseClient.from('posts').select('*').order('created_at',{ascending:false});
+  if(!error&&Array.isArray(data)){posts=data.map(p=>({id:p.id,user_id:p.user_id,name:p.name||'VibeLoop',text:p.text||p.content||'',created:p.created_at?new Date(p.created_at).toLocaleString():'Just now'}));persist();render()}
+  else if(error)console.warn('Supabase:',error.message);
+}
+async function bootAuth(){
+  if(!supabaseClient)return;
+  const {data}=await supabaseClient.auth.getSession();currentUser=data?.session?.user||null;updateAuthUIFromUser();
+  supabaseClient.auth.onAuthStateChange((_event,session)=>{currentUser=session?.user||null;updateAuthUIFromUser()});
+  await loadSupabasePosts();
+}
+if(localStorage.getItem('vibeloop_theme')==='dark'){document.body.classList.add('dark');const themeBtn=document.getElementById('themeBtn'); if(themeBtn) themeBtn.textContent='☀'}
+render();bootAuth();
+
+/* ===== VibeLoop Media ===== */
+let mediaItems = JSON.parse(localStorage.getItem('vibeloop_media') || '[]');
+let mediaPickerMode = 'video';
+
+function openMediaPicker(mode){
+  if(!requireAuth()) return;
+  mediaPickerMode = mode || 'video';
+  const p=document.getElementById('mediaPicker');
+  p.value='';
+  p.click();
+}
+function saveMedia(){localStorage.setItem('vibeloop_media',JSON.stringify(mediaItems));}
+function handleMediaFile(input){
+  const file=input.files?.[0];
+  if(!file) return;
+  if(!file.type.startsWith('video/')){showToast('Please choose a video file');return;}
+  const url=URL.createObjectURL(file);
+  const item={
+    id:crypto.randomUUID?.()||Date.now().toString(),
+    name:file.name,
+    size:file.size,
+    type:file.type,
+    url,
+    local:true,
+    created:new Date().toLocaleString()
+  };
+  mediaItems.unshift(item);
+  saveMedia();
+  renderMedia();
+  go('videos',document.querySelectorAll('.nav button')[1]);
+  showToast('Video added. You can watch or download it.');
+}
+function renderMedia(){
+  const box=document.getElementById('mediaList');
+  if(!box)return;
+  if(!mediaItems.length){
+    box.innerHTML='<p class="muted">No videos yet. Upload a video to start watching.</p>';
+    return;
+  }
+  box.innerHTML=mediaItems.map(m=>`
+    <article class="card" style="margin-top:10px">
+      <video controls preload="metadata" src="${escapeHtml(m.url)}"></video>
+      <div class="mediaMeta">
+        <div><b>${escapeHtml(m.name)}</b><div class="muted">${escapeHtml(m.created)}</div></div>
+        <div class="mediaBtns">
+          <a href="${escapeHtml(m.url)}" download="${escapeHtml(m.name)}"><button>⬇ Download</button></a>
+          <button onclick="removeMedia('${escapeHtml(m.id)}')">Delete</button>
+        </div>
+      </div>
+    </article>`).join('');
+}
+function removeMedia(id){
+  mediaItems=mediaItems.filter(x=>x.id!==id);
+  saveMedia();renderMedia();showToast('Video removed');
+}
+
+/* ===== WebRTC Calls ===== */
+let pc=null, localStream=null, callMode='video', callRoom=null;
+const rtcConfig={iceServers:[
+  {urls:'stun:stun.l.google.com:19302'},
+  {urls:'stun:stun1.l.google.com:19302'}
+]};
+
+function setCallStatus(s){const x=document.getElementById('callStatus');if(x)x.textContent=s;}
+async function startCall(mode='video'){
+  if(!requireAuth())return;
+  callMode=mode;
+  go('calls',document.querySelectorAll('.nav button')[3]);
+  try{
+    localStream=await navigator.mediaDevices.getUserMedia({video:mode==='video',audio:true});
+    document.getElementById('localVideo').srcObject=localStream;
+    if(mode==='voice') document.getElementById('localVideo').style.display='none';
+    else document.getElementById('localVideo').style.display='block';
+    pc=new RTCPeerConnection(rtcConfig);
+    localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+    pc.ontrack=e=>{document.getElementById('remoteVideo').srcObject=e.streams[0]};
+    pc.onconnectionstatechange=()=>setCallStatus('Call: '+pc.connectionState);
+    const offer=await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    callRoom=crypto.randomUUID?.()||String(Date.now());
+    localStorage.setItem('vibeloop_call_offer_'+callRoom,JSON.stringify(pc.localDescription));
+    setCallStatus('Call created. Share the call link with the other person.');
+    await shareCallLink();
+  }catch(e){
+    console.error(e);
+    showToast('Camera/microphone permission is required for calls');
+    setCallStatus('Could not access your camera or microphone.');
+  }
+}
+async function joinCall(room){
+  if(!requireAuth())return;
+  try{
+    const raw=localStorage.getItem('vibeloop_call_offer_'+room);
+    if(!raw){showToast('Call link is invalid or expired');return}
+    localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    document.getElementById('localVideo').srcObject=localStream;
+    pc=new RTCPeerConnection(rtcConfig);
+    localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+    pc.ontrack=e=>document.getElementById('remoteVideo').srcObject=e.streams[0];
+    await pc.setRemoteDescription(JSON.parse(raw));
+    const answer=await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    localStorage.setItem('vibeloop_call_answer_'+room,JSON.stringify(pc.localDescription));
+    setCallStatus('Joined call.');
+  }catch(e){console.error(e);showToast('Unable to join call')}
+}
+async function shareCallLink(){
+  if(!callRoom){showToast('Start a call first');return}
+  const url=location.href.split('#')[0]+'#call='+encodeURIComponent(callRoom);
+  try{
+    if(navigator.share)await navigator.share({title:'VibeLoop call',text:'Join my VibeLoop call',url});
+    else {await navigator.clipboard?.writeText(url);showToast('Call link copied');}
+  }catch(e){}
+}
+function toggleMute(){
+  if(!localStream)return;
+  const t=localStream.getAudioTracks()[0];if(!t)return;
+  t.enabled=!t.enabled;showToast(t.enabled?'Microphone on':'Microphone muted');
+}
+function toggleCamera(){
+  if(!localStream)return;
+  const t=localStream.getVideoTracks()[0];if(!t)return;
+  t.enabled=!t.enabled;showToast(t.enabled?'Camera on':'Camera off');
+}
+function endCall(){
+  if(pc)pc.close();
+  if(localStream)localStream.getTracks().forEach(t=>t.stop());
+  pc=null;localStream=null;
+  document.getElementById('localVideo').srcObject=null;
+  document.getElementById('remoteVideo').srcObject=null;
+  setCallStatus('Call ended.');
+}
+
+/* ===== Simple call-room chat ===== */
+function chatKey(){return 'vibeloop_chat_'+(callRoom||'lobby')}
+function loadChat(){
+  const box=document.getElementById('chatMessages');if(!box)return;
+  const arr=JSON.parse(localStorage.getItem(chatKey())||'[]');
+  box.innerHTML=arr.map(m=>`<div class="msg"><b>${escapeHtml(m.name)}</b><span>${escapeHtml(m.text)}</span></div>`).join('');
+  box.scrollTop=box.scrollHeight;
+}
+function sendChatMessage(){
+  if(!requireAuth())return;
+  const input=document.getElementById('chatInput'),text=input.value.trim();if(!text)return;
+  const arr=JSON.parse(localStorage.getItem(chatKey())||'[]');
+  arr.push({name:currentUser.user_metadata?.display_name||currentUser.email?.split('@')[0]||'You',text});
+  localStorage.setItem(chatKey(),JSON.stringify(arr));input.value='';loadChat();
+}
+
+/* Handle a shared call URL. */
+function checkCallHash(){
+  const m=location.hash.match(/^#call=(.+)$/);
+  if(m){callRoom=decodeURIComponent(m[1]);go('calls',document.querySelectorAll('.nav button')[3]);loadChat();joinCall(callRoom);}
+}
+window.addEventListener('hashchange',checkCallHash);
+
+renderMedia();
+setTimeout(checkCallHash,300);
+
+</script>
+</body>
+</html>
